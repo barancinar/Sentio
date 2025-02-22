@@ -11,11 +11,18 @@ import os
 app = Flask(__name__, template_folder='templates')
 
 # Load emotion detection model
-IMG_SHAPE = (100, 100, 3)
-emotion_model = get_base_model(IMG_SHAPE)
-emotion_model.add(tf.keras.layers.Dense(7, activation='softmax', name="softmax"))
-#emotion_model.load_weights('model/FERplus_1228-2223.h5')
-emotion_model.load_weights('model/FERplus_0124-1040_weights.h5')
+# Global değişken olarak bir kez yükle
+emotion_model = None
+
+def load_model():
+    global emotion_model
+    if emotion_model is None:
+        IMG_SHAPE = (100, 100, 3)
+        emotion_model = get_base_model(IMG_SHAPE)
+        emotion_model.add(tf.keras.layers.Dense(7, activation='softmax', name="softmax"))
+        emotion_model.load_weights('model/FERplus_0124-1040_weights.h5')
+
+load_model()
 emotions = ['neutral', 'happiness', 'surprise', 'sadness', 'anger', 'disgust', 'fear']
 
 def generate_frames():
@@ -242,9 +249,9 @@ def video_detect():
 
 
 
-# if __name__ == "__main__":
-#     app.run(debug=True)
-
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # Render'ın atadığı portu kullan
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(debug=True)
+
+# if __name__ == "__main__":
+#     port = int(os.environ.get("PORT", 5000))  # Render'ın atadığı portu kullan
+#     app.run(host="0.0.0.0", port=port, debug=True)
